@@ -1,21 +1,27 @@
 # In[1]:
 
 import streamlit as st
-import pandas as pd
 import sqlite3
+import pandas as pd
 
-# Title
-st.set_page_config(page_title="NASA NEO Dashboard", layout="wide")
-st.title("🚀 NASA Near-Earth Object (NEO) Dashboard")
+# ======================
+# APP TITLE
+# ======================
+st.set_page_config(page_title="NASA NEO Tracking", layout="wide")
+st.title("🚀 NASA Near-Earth Object (NEO) Tracking & Insights")
 
-# Connect to DB
+# ======================
+# CONNECT TO DB
+# ======================
 @st.cache_resource
 def get_connection():
-    return sqlite3.connect("nasa_neo.db")
+    return sqlite3.connect("neo_database.db")
 
 conn = get_connection()
 
-# Predefined Queries
+# ======================
+# QUERIES DICTIONARY
+# ======================
 queries = {
     "Count how many times each asteroid has approached Earth":
         """SELECT a.name, COUNT(*) AS approach_count
@@ -151,4 +157,20 @@ queries = {
            ORDER BY month;"""
 }
 
-# %%
+# ======================
+# SIDEBAR & QUERY SELECTOR
+# ======================
+st.sidebar.header("📊 Query Options")
+choice = st.sidebar.selectbox("Select a query to run:", list(queries.keys()))
+
+# ======================
+# RUN QUERY & DISPLAY
+# ======================
+if choice:
+    try:
+        df = pd.read_sql(queries[choice], conn)
+        st.subheader(f"Results for: {choice}")
+        st.dataframe(df, use_container_width=True)
+        st.success(f"Returned {len(df)} rows")
+    except Exception as e:
+        st.error(f"Error running query: {e}")
