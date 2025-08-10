@@ -403,19 +403,8 @@ ORDER BY month;
 pd.read_sql(q20, conn)
 
 
-# In[1]:
-
-
-import sqlite3
-
-conn = sqlite3.connect('your_database.db')
-c = conn.cursor()
-
-
 
 # %%
-
-import streamlit as st
 
 
 
